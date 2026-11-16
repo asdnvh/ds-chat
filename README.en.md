@@ -60,6 +60,15 @@ No telemetry, no third-party SDKs, three permissions only. Your API key is store
 local storage on device and is never uploaded anywhere else. Please report security issues per
 [SECURITY.md](SECURITY.md) — never post API keys in issues.
 
+## Known limitations
+
+- **History import can be slow**: importing a ZIP means unpacking it inside the WebView and writing every
+  session/attachment into IndexedDB. Large archives may take tens of seconds or more — **this is expected;
+  wait for the "imported N conversations" message and avoid repeated clicks or closing the app**. Reference:
+  a 128-session, ~8 MB archive imports in about 1–2 s on desktop Chromium; phones may be noticeably slower
+  depending on WebView version and storage speed. The import is transactional, so quitting mid-way does not
+  corrupt existing data.
+
 ## License
 
 Android port: MIT, Copyright (c) 2026 DS Chat project contributors.
