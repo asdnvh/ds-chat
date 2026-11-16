@@ -5,10 +5,11 @@ WebView 宿主 + 原生桥接，网页功能零改动，离线可用，无需自
 
 > **非官方项目**：本仓库为社区修改构建，与 DeepSeek 官方无关，未获官方背书。
 > 「DeepSeek」名称与 Logo 归其权利人所有。
+>
+> **上游说明**：上游 `chat-demo` 项目只提供网页版，没有 Android 工程或 APK；DeepSeek 另有自己的
+> 官方手机 App（与本开源项目无关）。本项目是社区基于该开源前端做的第三方 Android 封装，不是官方客户端。
 
 [![Build APK](https://github.com/asdnvh/ds-chat/actions/workflows/build.yml/badge.svg)](https://github.com/asdnvh/ds-chat/actions/workflows/build.yml)
-
-> 徽章里的 `asdnvh/ds-chat` 请替换成实际仓库地址。
 
 ## 特性
 

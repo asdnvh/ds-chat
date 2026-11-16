@@ -5,6 +5,10 @@ An unofficial Android client for [DeepSeek's open-source chat-demo](https://gith
 
 > **Unofficial.** This is a community build, not affiliated with or endorsed by DeepSeek.
 > "DeepSeek" and its logo are trademarks of their respective owner.
+>
+> **Upstream note:** the upstream `chat-demo` project ships a web app only (no Android project or APK).
+> DeepSeek distributes a separate official mobile app, which is unrelated to this open-source project.
+> This repository is a third-party Android wrapper around the open-source web frontend — not an official client.
 
 ## Features
 
