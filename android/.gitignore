@@ -1,0 +1,17 @@
+# Gradle / Android Studio
+.gradle/
+build/
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# 签名材料：绝不能提交到公开仓库
+keystore.properties
+keystore/
+*.jks
+*.keystore
+
+# 系统文件
+.DS_Store
+Thumbs.db

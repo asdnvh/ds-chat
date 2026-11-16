@@ -1,0 +1,31 @@
+# ---- Build outputs ----
+*.apk
+*.aab
+build/
+.gradle/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+
+# ---- Signing secrets: NEVER commit ----
+keystore.properties
+keystore/
+*.jks
+*.keystore
+*.p12
+
+# ---- IDE / OS ----
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Local-only artifacts ----
+_inspect/
+artifacts/
+分享包*/
+签名材料*/
+*.log
+*.tmp

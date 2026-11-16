@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEYSTORE: ${{ secrets.KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install Android SDK packages
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" "platforms;android-37" "build-tools;36.0.0" > /dev/null
+
+      - name: Prepare signing material
+        if: env.HAS_KEYSTORE == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          mkdir -p android/keystore
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > android/keystore/dschat-release.jks
+          {
+            echo "storeFile=keystore/dschat-release.jks"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/keystore.properties
+
+      - name: Warn when signing secrets are missing
+        if: env.HAS_KEYSTORE != 'true'
+        run: |
+          echo "::warning::KEYSTORE_BASE64 secret is not configured - the release APK will be debug-signed and is NOT suitable for public distribution."
+
+      - name: Build release APK
+        working-directory: android
+        run: ./gradlew --no-daemon assembleRelease
+
+      - name: Verify signature
+        working-directory: android/app/build/outputs/apk/release
+        run: |
+          BT="$ANDROID_HOME/build-tools/36.0.0"
+          "$BT/apksigner" verify --verbose --print-certs app-release.apk
+
+      - name: Collect release assets
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cp android/app/build/outputs/apk/release/app-release.apk "DSChat-${VERSION}.apk"
+          cp LICENSE "LICENSE.txt"
+          cp NOTICE "NOTICE.txt"
+          cp docs/THIRD-PARTY-NOTICES.md "THIRD-PARTY-NOTICES.txt"
+          sha256sum "DSChat-${VERSION}.apk" > SHA256SUMS.txt
+          ls -lh DSChat-*.apk LICENSE.txt NOTICE.txt THIRD-PARTY-NOTICES.txt SHA256SUMS.txt
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "DS Chat ${GITHUB_REF_NAME}" \
+            --generate-notes \
+            "DSChat-*.apk" LICENSE.txt NOTICE.txt THIRD-PARTY-NOTICES.txt SHA256SUMS.txt

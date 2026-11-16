@@ -1,0 +1,59 @@
+name: Bug report
+description: 报告一个问题（请勿粘贴 API Key / 聊天内容）
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈！提交前请先搜索已有 issue。
+        **请勿在 issue 中粘贴 API Key、聊天内容或任何个人信息。**
+  - type: input
+    id: version
+    attributes:
+      label: DS Chat 版本
+      description: 设置页底部 / Releases 中的版本号，或 APK 文件名
+      placeholder: "0.1.1"
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: 手机型号与 Android 版本
+      placeholder: "Pixel 7 / Android 15"
+    validations:
+      required: true
+  - type: input
+    id: webview
+    attributes:
+      label: Android System WebView 版本
+      description: 设置 → 应用 → Android System WebView 中查看
+      placeholder: "157.0.x"
+    validations:
+      required: false
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开应用
+        2. 点击 ...
+        3. 出现 ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为 vs 实际行为
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志（可选，注意脱敏）
+      description: |
+        `adb logcat -s DSChatApp DSChatWeb AndroidRuntime` 的输出片段。
+        粘贴前请删除 API Key 与聊天内容。
+      render: text
+    validations:
+      required: false

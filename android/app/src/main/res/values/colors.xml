@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 与网页应用浅色主题的背景色一致，避免启动白屏闪烁 -->
+    <color name="app_window_background">#FFFFFF</color>
+    <color name="ic_launcher_background">#4D6BFE</color>
+</resources>

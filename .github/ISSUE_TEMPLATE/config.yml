@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全问题 / Security issue
+    url: https://github.com/asdnvh/ds-chat/security/advisories/new
+    about: 请勿公开讨论安全漏洞，使用 GitHub Security Advisories 私下报告（见 SECURITY.md）
+  - name: 上游 chat-demo 的问题
+    url: https://github.com/deepseek-ai/chat-demo/issues
+    about: 网页应用本身的问题（非 Android 外壳）请反馈给上游项目

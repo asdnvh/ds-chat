@@ -1,0 +1,23 @@
+DS Chat — NOTICE
+================================================================================
+
+DS Chat is an unofficial Android client for the open-source project
+"chat-demo" by DeepSeek.
+
+Upstream project : https://github.com/deepseek-ai/chat-demo
+Upstream version : v0.1.1
+Upstream license : MIT License
+Upstream copyright: Copyright (c) 2026 DeepSeek
+
+The Android port (WebView host, native bridges, build scripts, documentation
+and all other modifications) is Copyright (c) 2026 DS Chat project contributors
+and is released under the MIT License (see LICENSE).
+
+The upstream MIT license text is retained unchanged in the application package
+as android/app/src/main/assets/LICENSE, and reproduced in LICENSE.
+
+Third-party dependencies are listed, with their license texts, in
+docs/THIRD-PARTY-NOTICES.md.
+
+"DeepSeek" and its logo are trademarks of their respective owner. This project
+is not affiliated with, endorsed by, or sponsored by DeepSeek.
