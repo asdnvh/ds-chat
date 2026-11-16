@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: build-${{ github.ref }}
@@ -38,10 +38,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Install Android SDK packages
-        run: |
-          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
-          "$SDKMANAGER" "platforms;android-37" "build-tools;36.0.0" > /dev/null
+        run: bash .github/scripts/install-android-sdk.sh
 
       - name: Build debug APK
         working-directory: android
@@ -69,3 +66,17 @@ jobs:
           name: DSChat-release-apk
           path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
+
+      # 失败时把 SDK 安装日志写进 commit 评论，便于公开排查（无需登录 API）
+      - name: Publish SDK install log for debugging
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ ! -s sdk-install.log ]; then
+            echo "没有 sdk-install.log，跳过"
+            exit 0
+          fi
+          tail -c 60000 sdk-install.log > sdk-install.tail.log
+          jq -Rs '{body: ("CI failure: install-android-sdk log\n```\n" + . + "\n```")}' sdk-install.tail.log > payload.json
+          gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" --input payload.json > /dev/null || true
