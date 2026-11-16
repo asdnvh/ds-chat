@@ -11,6 +11,16 @@ WebView 宿主 + 原生桥接，网页功能零改动，离线可用，无需自
 
 [![Build APK](https://github.com/asdnvh/ds-chat/actions/workflows/build.yml/badge.svg)](https://github.com/asdnvh/ds-chat/actions/workflows/build.yml)
 
+## 项目定位
+
+- **只做 Android 封装**：把上游 chat-demo 的官方网页构建产物（`dist`）装进原生 WebView 宿主，
+  补齐 Android 系统能力（文件选择、blob 下载、麦克风权限、外链、返回键、状态栏/键盘避让等）。
+- **不新增、不修改任何聊天功能**：功能与上游 `chat-demo` 保持一致，上游更新后本项目只做同步打包。
+- **非官方客户端**：上游本身只有网页版（无 Android 工程或 APK）；DeepSeek 另有独立官方 App，
+  与本项目无关。
+- 反馈范围：欢迎提 Android 封装层的问题（安装、权限、WebView 兼容、系统栏/键盘等）；
+  网页功能本身的建议或 bug 请提交给[上游项目](https://github.com/deepseek-ai/chat-demo/issues)。
+
 ## 特性
 
 - 多会话、流式回复、深度思考、联网搜索、链接阅读、引用来源
