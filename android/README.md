@@ -27,7 +27,7 @@ Android Studio：`File → Open` 选择本目录（`android/`），等待 Sync �
 ## 安装
 
 ```powershell
-adb install -r ..\DSChat-0.1.1-debug.apk
+adb install -r ..\DSChat-0.1.2-debug.apk
 ```
 
 首次启动会弹出设置页要求填写 DeepSeek API Key（网页原有逻辑，Key 只存开发机）。

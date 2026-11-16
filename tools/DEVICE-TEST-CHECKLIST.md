@@ -1,10 +1,10 @@
 # DS Chat Android 真机测试清单
 
-> 适用版本：`DSChat-0.1.1-debug.apk` / `DSChat-0.1.1-release.apk`
+> 适用版本：`DSChat-0.1.2-debug.apk` / `DSChat-0.1.2-release.apk`
 > 包名：`com.dschat.android`　主 Activity：`com.dschat.android.MainActivity`
 > 环境要求：Android 8.0（API 26）及以上；需要网络（API 直连 `https://api.deepseek.com`）。
 > 说明：本清单用于真机手动验收。安装命令（可选，替代点按安装）：
-> `adb install -r -g DSChat-0.1.1-debug.apk`
+> `adb install -r -g DSChat-0.1.2-debug.apk`
 > debug 包已开启 WebView 远程调试，可在桌面 Chrome 打开 `chrome://inspect` 查看页面控制台。
 
 ## 测试前准备
