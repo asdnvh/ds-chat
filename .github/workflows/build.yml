@@ -50,7 +50,10 @@ jobs:
 
       - name: Static verification (best effort)
         shell: pwsh
-        run: ./tools/static-verify-apk.ps1
+        run: |
+          ./tools/static-verify-apk.ps1 `
+            -DebugApk android/app/build/outputs/apk/debug/app-debug.apk `
+            -ReleaseApk android/app/build/outputs/apk/release/app-release.apk
         continue-on-error: true
 
       - name: Upload debug APK

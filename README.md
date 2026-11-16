@@ -37,7 +37,7 @@ WebView 宿主 + 原生桥接，网页功能零改动，离线可用，无需自
 
 ## 构建
 
-环境：JDK 17+（Android Studio 自带 JDK 即可）、Android SDK（platform `android-37`、build-tools `36.0.0`）。
+环境：JDK 17+（Android Studio 自带 JDK 即可）、Android SDK（platform `android-36`、build-tools `36.0.0`）。
 
 ```bash
 cd android

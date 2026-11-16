@@ -45,7 +45,7 @@ function Find-SdkTool([string]$Relative) {
     $roots = @()
     if ($env:ANDROID_HOME) { $roots += $env:ANDROID_HOME }
     if ($env:ANDROID_SDK_ROOT) { $roots += $env:ANDROID_SDK_ROOT }
-    $roots += (Join-Path $env:LOCALAPPDATA 'Android\Sdk')
+    $roots += 'E:\Android\Sdk'
     foreach ($root in $roots) {
         if (-not $root) { continue }
         $candidate = Join-Path $root $Relative
@@ -58,7 +58,7 @@ function Find-LatestBuildTool([string]$FileName) {
     $roots = @()
     if ($env:ANDROID_HOME) { $roots += $env:ANDROID_HOME }
     if ($env:ANDROID_SDK_ROOT) { $roots += $env:ANDROID_SDK_ROOT }
-    $roots += (Join-Path $env:LOCALAPPDATA 'Android\Sdk')
+    $roots += 'E:\Android\Sdk'
     foreach ($root in $roots) {
         if (-not $root) { continue }
         $bt = Join-Path $root 'build-tools'
@@ -147,7 +147,7 @@ function Test-Apk([string]$Label, [string]$Apk, [bool]$ExpectDebuggable) {
     Add-Check $Label 'application label' ($appLabel -eq 'DS Chat') "label=$appLabel"
     Add-Check $Label 'versionName' ($verName -eq '0.1.1') "versionName=$verName"
     Add-Check $Label 'minSdkVersion' ($minSdk -eq '26') "minSdk=$minSdk"
-    Add-Check $Label 'targetSdkVersion' ($tgtSdk -eq '37') "targetSdk=$tgtSdk"
+    Add-Check $Label 'targetSdkVersion' ($tgtSdk -eq '36') "targetSdk=$tgtSdk"
     Add-Check $Label 'launchable activity' ($act -eq 'com.dschat.android.MainActivity') "activity=$act"
     Add-Check $Label 'declared permissions (3 explicit)' ($explicitPerms.Count -eq 3) ("count={0}: {1}" -f $explicitPerms.Count, ($explicitPerms -join ', '))
     $expectedPerms = @(
@@ -245,7 +245,7 @@ foreach ($c in $script:Checks) {
 [void]$sb.AppendLine('  - release APK: signed with the Android debug key (temporary choice),')
 [void]$sb.AppendLine('                 NOT debuggable, WebView assets embedded, dex present')
 [void]$sb.AppendLine('  - both APKs share package com.dschat.android, versionName 0.1.1,')
-[void]$sb.AppendLine('    minSdk 26, targetSdk 37, 3 declared permissions')
+[void]$sb.AppendLine('    minSdk 26, targetSdk 36, 3 declared permissions')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine(("Generated: {0}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')))
 

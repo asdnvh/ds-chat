@@ -23,7 +23,7 @@ cd android
 ./gradlew assembleRelease
 ```
 
-JDK 17+ and Android SDK (platform `android-37`, build-tools `36.0.0`) are required.
+JDK 17+ and Android SDK (platform `android-36`, build-tools `36.0.0`) are required.
 The upstream `dist` assets are vendored under `android/app/src/main/assets/` so builds work offline;
 see [docs/UPSTREAM.md](docs/UPSTREAM.md) to refresh them.
 

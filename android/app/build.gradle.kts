@@ -15,12 +15,15 @@ val keystoreProperties = Properties().apply {
 
 android {
     namespace = "com.dschat.android"
-    compileSdk = 37
+    compileSdk = 36
+
+    // 固定 build-tools，避免不同环境解析到不同版本
+    buildToolsVersion = "36.0.0"
 
     defaultConfig {
         applicationId = "com.dschat.android"
         minSdk = 26
-        targetSdk = 37
+        targetSdk = 36
         versionCode = 1
         versionName = "0.1.1"
     }

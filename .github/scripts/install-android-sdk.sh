@@ -21,7 +21,7 @@ fi
 echo "SDK_ROOT=$SDK_ROOT"
 ls -la "$SDK_ROOT" || true
 
-REQUIRED_PLATFORM="android-37"
+REQUIRED_PLATFORM="android-36"
 REQUIRED_BUILDTOOLS="36.0.0"
 
 # ---------- 定位 sdkmanager ----------

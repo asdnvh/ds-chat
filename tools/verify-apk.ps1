@@ -110,7 +110,7 @@ function Find-Adb {
     $candidates = @()
     if ($env:ANDROID_HOME)    { $candidates += (Join-Path $env:ANDROID_HOME 'platform-tools\adb.exe') }
     if ($env:ANDROID_SDK_ROOT){ $candidates += (Join-Path $env:ANDROID_SDK_ROOT 'platform-tools\adb.exe') }
-    $candidates += (Join-Path $env:LOCALAPPDATA 'Android\Sdk\platform-tools\adb.exe')
+    $candidates += 'E:\Android\Sdk\platform-tools\adb.exe'
     foreach ($c in $candidates) {
         if ($c -and (Test-Path -LiteralPath $c -PathType Leaf)) { return $c }
     }
@@ -122,7 +122,7 @@ function Find-Emulator {
     $candidates = @()
     if ($env:ANDROID_HOME)    { $candidates += (Join-Path $env:ANDROID_HOME 'emulator\emulator.exe') }
     if ($env:ANDROID_SDK_ROOT){ $candidates += (Join-Path $env:ANDROID_SDK_ROOT 'emulator\emulator.exe') }
-    $candidates += (Join-Path $env:LOCALAPPDATA 'Android\Sdk\emulator\emulator.exe')
+    $candidates += 'E:\Android\Sdk\emulator\emulator.exe'
     foreach ($c in $candidates) {
         if ($c -and (Test-Path -LiteralPath $c -PathType Leaf)) { return $c }
     }

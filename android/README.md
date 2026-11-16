@@ -4,7 +4,7 @@
 （MIT）封装为可侧载安装的 Android APK。网页代码零改动，原生层只补齐 WebView 缺失的浏览器能力。
 
 - 包名：`com.dschat.android`，显示名：`DS Chat`
-- compileSdk 37 / targetSdk 37 / minSdk 26（Android 8.0+），纯 Java，无第三方运行库
+- compileSdk 36 / targetSdk 36 / minSdk 26（Android 8.0+），纯 Java，无第三方运行库
 - 页面通过虚拟域名 `https://appassets.androidplatform.net/` 从 `assets/` 加载（安全上下文，
   localStorage / IndexedDB / getUserMedia / AudioContext 均可用），不会产生真实网络请求
 
