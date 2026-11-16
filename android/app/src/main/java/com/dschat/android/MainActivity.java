@@ -645,13 +645,22 @@ public class MainActivity extends Activity {
     }
 
     void showToast(final String message) {
+        showToast(message, Toast.LENGTH_SHORT);
+    }
+
+    /** 稍长的原生 Toast，用于导入历史对话等耗时操作提示。 */
+    void showToastLong(final String message) {
+        showToast(message, Toast.LENGTH_LONG);
+    }
+
+    private void showToast(final String message, final int duration) {
         if (message == null) {
             return;
         }
         runOnUiThread(
                 () -> {
                     try {
-                        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, message, duration).show();
                     } catch (RuntimeException ignored) {
                         // 页面销毁过程中忽略
                     }

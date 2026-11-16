@@ -47,4 +47,10 @@ final class NativeBridge {
     public void toast(String message) {
         activity.showToast(String.valueOf(message));
     }
+
+    /** 稍长的原生 Toast（导入历史对话等耗时操作的提示）。 */
+    @JavascriptInterface
+    public void toastLong(String message) {
+        activity.showToastLong(String.valueOf(message));
+    }
 }

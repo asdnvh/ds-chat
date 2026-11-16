@@ -166,4 +166,81 @@
     }
     return nativeOpen.apply(window, arguments);
   };
+
+  // ---------------------------------------------------------------------------
+  // 4. 导入历史对话提示
+  //    导入要在本机解压 ZIP 并逐条写入数据库，会话多/图片大时需要几十秒甚至更久。
+  //    用户点「确认导入」后弹一条原生 Toast 告知正在处理，完成/失败时再提示一次，
+  //    避免误以为卡死而中途退出。只读取界面文本，不改变任何导入逻辑。
+  // ---------------------------------------------------------------------------
+  function toastLong(message) {
+    try {
+      if (native && native.toastLong) {
+        native.toastLong(message);
+      } else if (native && native.toast) {
+        native.toast(message);
+      }
+    } catch (e) {
+      // 忽略
+    }
+  }
+
+  var IMPORT_START_ZH = '确认导入';
+  var IMPORT_START_EN = 'Import';
+  var DONE_PATTERN = /已导入\s*(\d+)\s*个对话|Imported\s+(\d+)\s+chats?/;
+  var importWatch = null;
+
+  function startImportWatch() {
+    if (importWatch) {
+      return;
+    }
+    var baseline = document.body ? document.body.innerText : '';
+    var baselineMatch = DONE_PATTERN.exec(baseline);
+    var baselineDone = baselineMatch ? baselineMatch[0] : null;
+    var startedAt = Date.now();
+    toastLong('正在导入历史对话，请稍候…会话多时可能需要几十秒，请不要退出应用');
+    importWatch = setInterval(function () {
+      var text = document.body ? document.body.innerText : '';
+      var done = DONE_PATTERN.exec(text);
+      if (done && done[0] !== baselineDone) {
+        clearInterval(importWatch);
+        importWatch = null;
+        toastLong('导入完成：' + (done[1] || done[2]) + ' 个对话');
+        return;
+      }
+      if (text.indexOf('文件导入失败') >= 0 || text.indexOf('File import failed') >= 0) {
+        clearInterval(importWatch);
+        importWatch = null;
+        toastLong('导入失败，请检查文件格式或重新导出后再试');
+        return;
+      }
+      if (Date.now() - startedAt > 6 * 60 * 1000) {
+        clearInterval(importWatch);
+        importWatch = null;
+      }
+    }, 1500);
+  }
+
+  document.addEventListener(
+    'click',
+    function (event) {
+      var button = event.target && event.target.closest ? event.target.closest('button') : null;
+      if (!button) {
+        return;
+      }
+      var label = (button.textContent || '').trim();
+      if (label === IMPORT_START_ZH) {
+        startImportWatch();
+        return;
+      }
+      if (
+        label === IMPORT_START_EN &&
+        document.body &&
+        document.body.innerText.indexOf('Import chat history?') >= 0
+      ) {
+        startImportWatch();
+      }
+    },
+    true
+  );
 })();
