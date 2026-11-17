@@ -117,11 +117,106 @@
     image.src = dataUrl;
     image.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;border-radius:4px';
     wrapper.appendChild(image);
-    wrapper.addEventListener('click', closeOverlay);
+    var menu = null;
+    var timer = null;
+    function closeMenu() {
+      if (menu) {
+        menu.remove();
+        menu = null;
+      }
+    }
+    function showMenu() {
+      if (menu) {
+        return;
+      }
+      menu = document.createElement('div');
+      menu.style.cssText =
+        'position:absolute;left:50%;bottom:48px;transform:translateX(-50%);background:#2b2b2b;' +
+        'color:#fff;border-radius:12px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.4)';
+      var save = document.createElement('button');
+      save.type = 'button';
+      save.textContent = '保存图片';
+      save.style.cssText = 'display:block;padding:14px 30px;background:none;border:0;color:#fff;font-size:15px';
+      save.addEventListener('click', function (event) {
+        event.stopPropagation();
+        closeMenu();
+        try {
+          if (native && native.saveImage) {
+            native.saveImage(image.src, 'image-' + Date.now() + '.jpg');
+          }
+        } catch (e) {
+          // 忽略
+        }
+      });
+      menu.appendChild(save);
+      wrapper.appendChild(menu);
+    }
+    // 点图片本身不关闭；点周边空白处关闭
+    image.addEventListener('click', function (event) {
+      event.stopPropagation();
+      closeMenu();
+    });
+    wrapper.addEventListener('click', function (event) {
+      if (event.target === wrapper) {
+        closeOverlay();
+      }
+    });
+    image.addEventListener(
+      'touchstart',
+      function () {
+        timer = setTimeout(showMenu, 550);
+      },
+      { passive: true }
+    );
+    image.addEventListener('touchend', function () {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    });
+    image.addEventListener('touchmove', function () {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    });
+    image.addEventListener('contextmenu', function (event) {
+      event.preventDefault();
+      showMenu();
+    });
     document.body.appendChild(wrapper);
     overlay = wrapper;
     notifyOverlay(true);
   }
+
+  window.__dsShowImageOverlay = showImageOverlay;
+
+  // 文件卡片长按分享：把 blob 读成 base64 交给原生系统分享弹窗
+  window.__dsChatShareFile = function (url, name) {
+    try {
+      fetch(url)
+        .then(function (response) {
+          return response.blob();
+        })
+        .then(function (blob) {
+          var reader = new FileReader();
+          reader.onload = function () {
+            try {
+              var dataUrl = String(reader.result);
+              var comma = dataUrl.indexOf(',');
+              if (native && native.shareFile) {
+                native.shareFile(dataUrl.slice(comma + 1), blob.type || 'application/octet-stream', name);
+              }
+            } catch (e) {
+              // 忽略
+            }
+          };
+          reader.readAsDataURL(blob);
+        });
+    } catch (e) {
+      // 忽略
+    }
+  };
 
   function openBlob(url) {
     fetch(url)
@@ -244,3 +339,38 @@
     true
   );
 })();
+
+  // 图片搜索等远程图片：点击后用内置浮层预览（与 blob 图片预览一致）
+  document.addEventListener(
+    'click',
+    function (event) {
+      var target = event.target;
+      if (!target || !target.closest) {
+        return;
+      }
+      var image = target.closest('img[data-ds-image-preview]');
+      if (!image || !image.src) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof window.__dsShowImageOverlay === 'function') {
+        window.__dsShowImageOverlay(image.src);
+      }
+    },
+    true
+  );
+  // 原生 PDF 阅读器入口：经由注入脚本调用桥接（直接调用偶发 non-injected object）
+  window.__dsChatOpenPdf = function (base64, name) {
+    try {
+      native.openPdf(base64, name);
+      return true;
+    } catch (e) {
+      try {
+        window.DSChatNative.openPdf(base64, name);
+        return true;
+      } catch (e2) {
+        return false;
+      }
+    }
+  };

@@ -14,9 +14,8 @@
 ## 构建
 
 ```powershell
-# 按本机实际路径修改（下方为 Android Studio 默认安装位置）
-$env:JAVA_HOME    = "C:\Program Files\Android\Android Studio\jbr"
-$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+$env:JAVA_HOME = "E:\Android\Android Studio\jbr"   # JDK 17+
+$env:ANDROID_HOME = "E:\Android\Sdk"
 .\gradlew.bat assembleDebug
 # 产物：app\build\outputs\apk\debug\app-debug.apk
 ```
@@ -30,7 +29,7 @@ Android Studio：`File → Open` 选择本目录（`android/`），等待 Sync �
 adb install -r ..\DSChat-0.1.2-debug.apk
 ```
 
-首次启动会弹出设置页要求填写 DeepSeek API Key（网页原有逻辑，Key 只存开发机）。
+首次启动会弹出设置页要求填写 DeepSeek API Key（网页原有逻辑，Key 只存本机）。
 
 ## 目录说明
 

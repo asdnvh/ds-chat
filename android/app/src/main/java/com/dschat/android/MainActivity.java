@@ -116,7 +116,8 @@ public class MainActivity extends Activity {
         // 页面全部由 AssetServer 从 assets 提供，不需要 file:// 访问
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(true);
-        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        // 图片搜索结果的图片常为 http，允许混合内容，否则会被 WebView 全部拦截
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         settings.setSupportMultipleWindows(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
         // 原生应用式的固定缩放，避免双指缩放打乱移动端布局
@@ -649,6 +650,95 @@ public class MainActivity extends Activity {
     }
 
     /** 稍长的原生 Toast，用于导入历史对话等耗时操作提示。 */
+    /** PDF 内置阅读：写入缓存后用系统 PdfRenderer 渲染 */
+    void openPdf(String base64, String fileName) {
+        try {
+            byte[] data = android.util.Base64.decode(base64, android.util.Base64.DEFAULT);
+            java.io.File dir = new java.io.File(getCacheDir(), "preview");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            java.io.File file = new java.io.File(dir, "pdf-" + System.currentTimeMillis() + ".pdf");
+            try (java.io.FileOutputStream out = new java.io.FileOutputStream(file)) {
+                out.write(data);
+            }
+            android.content.Intent intent = new android.content.Intent(this, PdfViewerActivity.class);
+            intent.putExtra(PdfViewerActivity.EXTRA_PATH, file.getAbsolutePath());
+            intent.putExtra(PdfViewerActivity.EXTRA_NAME, fileName);
+            startActivity(intent);
+        } catch (Exception error) {
+            showToast("打开 PDF 失败：" + error.getMessage());
+        }
+    }
+
+    /** 用系统里已安装的应用打开文件（WPS/Word/浏览器等） */
+    void openFile(String base64, String mimeType, String fileName) {
+        try {
+            byte[] data = android.util.Base64.decode(base64, android.util.Base64.DEFAULT);
+            android.net.Uri uri = DownloadStore.saveForShare(this, data, mimeType, fileName);
+            if (uri == null) {
+                showToast("保存文件失败");
+                return;
+            }
+            android.content.Intent view = new android.content.Intent(android.content.Intent.ACTION_VIEW);
+            view.setDataAndType(uri, mimeType);
+            view.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(android.content.Intent.createChooser(view, "用其他应用打开"));
+        } catch (Exception error) {
+            showToast("打开失败：" + error.getMessage());
+        }
+    }
+    /** 系统分享弹窗：把文件保存到下载目录后转发到微信/QQ 等应用 */
+    void shareFile(String base64, String mimeType, String fileName) {
+        try {
+            byte[] data = android.util.Base64.decode(base64, android.util.Base64.DEFAULT);
+            android.net.Uri uri = DownloadStore.saveForShare(this, data, mimeType, fileName);
+            if (uri == null) {
+                showToast("保存文件失败");
+                return;
+            }
+            android.content.Intent send = new android.content.Intent(android.content.Intent.ACTION_SEND);
+            send.setType(mimeType);
+            send.putExtra(android.content.Intent.EXTRA_STREAM, uri);
+            send.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(android.content.Intent.createChooser(send, "分享到"));
+        } catch (Exception error) {
+            showToast("分享失败：" + error.getMessage());
+        }
+    }
+
+    /** 下载网络图片并保存到下载目录（图片搜索结果的“保存图片”用） */
+    void saveImage(String url, String fileName) {
+        new Thread(() -> {
+            try {
+                java.net.HttpURLConnection connection =
+                        (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+                connection.setConnectTimeout(15000);
+                connection.setReadTimeout(30000);
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) DS-Chat");
+                byte[] data = readFully(connection.getInputStream());
+                String mime = connection.getContentType();
+                if (mime == null || !mime.startsWith("image/")) {
+                    mime = "image/jpeg";
+                }
+                String saved = DownloadStore.save(MainActivity.this, data, mime, fileName);
+                runOnUiThread(() -> showToast("已保存到「下载/DSChat/" + saved + "」"));
+            } catch (Exception error) {
+                runOnUiThread(() -> showToast("保存图片失败：" + error.getMessage()));
+            }
+        }).start();
+    }
+
+    private static byte[] readFully(java.io.InputStream input) throws java.io.IOException {
+        try (java.io.InputStream in = input; java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            return out.toByteArray();
+        }
+    }
     void showToastLong(final String message) {
         showToast(message, Toast.LENGTH_LONG);
     }

@@ -8,10 +8,10 @@ SYNOPSIS
     PASS/FAIL report. Works with PowerShell 5.1 and 7+. ASCII-only script body.
 
 .PARAMETER DebugApk
-    Path to the debug APK. Default: <repo root>/DSChat-0.1.2-debug.apk
+    Path to the debug APK. Default: <repo root>/DSChat-0.1.3-debug.apk
 
 .PARAMETER ReleaseApk
-    Path to the release APK. Default: <repo root>/DSChat-0.1.2-release.apk
+    Path to the release APK. Default: <repo root>/DSChat-0.1.3-release.apk
 
 .PARAMETER OutFile
     Report path. Default: <repo root>/artifacts/static-verification.txt
@@ -34,8 +34,8 @@ $ErrorActionPreference = 'Continue'
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $ScriptDir
-if ([string]::IsNullOrWhiteSpace($DebugApk)) { $DebugApk = Join-Path $RepoRoot 'DSChat-0.1.2-debug.apk' }
-if ([string]::IsNullOrWhiteSpace($ReleaseApk)) { $ReleaseApk = Join-Path $RepoRoot 'DSChat-0.1.2-release.apk' }
+if ([string]::IsNullOrWhiteSpace($DebugApk)) { $DebugApk = Join-Path $RepoRoot 'DSChat-0.1.3-debug.apk' }
+if ([string]::IsNullOrWhiteSpace($ReleaseApk)) { $ReleaseApk = Join-Path $RepoRoot 'DSChat-0.1.3-release.apk' }
 if ([string]::IsNullOrWhiteSpace($OutFile)) { $OutFile = Join-Path $RepoRoot 'artifacts\static-verification.txt' }
 
 $OutDir = Split-Path -Parent $OutFile
@@ -145,15 +145,16 @@ function Test-Apk([string]$Label, [string]$Apk, [bool]$ExpectDebuggable) {
 
     Add-Check $Label 'package name' ($pkgName -eq 'com.dschat.android') "name=$pkgName"
     Add-Check $Label 'application label' ($appLabel -eq 'DS Chat') "label=$appLabel"
-    Add-Check $Label 'versionName' ($verName -eq '0.1.2') "versionName=$verName"
+    Add-Check $Label 'versionName' ($verName -eq '0.1.3') "versionName=$verName"
     Add-Check $Label 'minSdkVersion' ($minSdk -eq '26') "minSdk=$minSdk"
     Add-Check $Label 'targetSdkVersion' ($tgtSdk -eq '36') "targetSdk=$tgtSdk"
     Add-Check $Label 'launchable activity' ($act -eq 'com.dschat.android.MainActivity') "activity=$act"
-    Add-Check $Label 'declared permissions (3 explicit)' ($explicitPerms.Count -eq 3) ("count={0}: {1}" -f $explicitPerms.Count, ($explicitPerms -join ', '))
+    Add-Check $Label 'declared permissions (4 explicit)' ($explicitPerms.Count -eq 4) ("count={0}: {1}" -f $explicitPerms.Count, ($explicitPerms -join ', '))
     $expectedPerms = @(
         'android.permission.INTERNET',
         'android.permission.RECORD_AUDIO',
-        'android.permission.WRITE_EXTERNAL_STORAGE'
+        'android.permission.MODIFY_AUDIO_SETTINGS',
+            'android.permission.WRITE_EXTERNAL_STORAGE'
     )
     $permMissing = @($expectedPerms | Where-Object { $explicitPerms -notcontains $_ })
     Add-Check $Label 'expected permission set' ($permMissing.Count -eq 0) ("missing: " + $(if ($permMissing.Count -eq 0) { 'none' } else { $permMissing -join ', ' }))
@@ -174,15 +175,15 @@ function Test-Apk([string]$Label, [string]$Apk, [bool]$ExpectDebuggable) {
         $entries = @($zip.Entries | Where-Object { $_.Name -ne '' })
         $assets = @($entries | Where-Object { $_.FullName -like 'assets/*' })
         # 153 个官方 dist 文件 + inject.js + THIRD-PARTY-NOTICES.txt + PORT-LICENSE.txt = 156
-        Add-Check $Label 'assets file count == 156' ($assets.Count -eq 156) ("count={0}" -f $assets.Count)
+        Add-Check $Label 'assets file count == 162' ($assets.Count -eq 162) ("count={0}" -f $assets.Count)
         $required = @(
             'assets/index.html',
             'assets/LICENSE',
             'assets/THIRD-PARTY-NOTICES.txt',
             'assets/PORT-LICENSE.txt',
             'assets/inject.js',
-            'assets/static/js/main.9820cd3a.js',
-            'assets/static/css/main.7361e32c.css'
+            'assets/static/js/main.c04dd48a.js',
+            'assets/static/css/main.92a441fb.css'
         )
         foreach ($name in $required) {
             $e = $entries | Where-Object { $_.FullName -eq $name } | Select-Object -First 1
@@ -217,7 +218,7 @@ $passCount = @($script:Checks | Where-Object { $_.Result -eq 'PASS' }).Count
 $verdict = if ($failCount -eq 0 -and $passCount -gt 0) { 'PASS' } else { 'FAIL' }
 
 $sb = New-Object System.Text.StringBuilder
-[void]$sb.AppendLine('Static verification of DS Chat APKs (com.dschat.android 0.1.2)')
+[void]$sb.AppendLine('Static verification of DS Chat APKs (com.dschat.android 0.1.3)')
 [void]$sb.AppendLine('=' * 78)
 [void]$sb.AppendLine(("Verdict: {0}   ({1} PASS / {2} FAIL)" -f $verdict, $passCount, $failCount))
 [void]$sb.AppendLine('')
@@ -244,8 +245,8 @@ foreach ($c in $script:Checks) {
 [void]$sb.AppendLine('  - debug APK  : signed, debuggable, WebView assets embedded, dex present')
 [void]$sb.AppendLine('  - release APK: signed with the Android debug key (temporary choice),')
 [void]$sb.AppendLine('                 NOT debuggable, WebView assets embedded, dex present')
-[void]$sb.AppendLine('  - both APKs share package com.dschat.android, versionName 0.1.2,')
-[void]$sb.AppendLine('    minSdk 26, targetSdk 36, 3 declared permissions')
+[void]$sb.AppendLine('  - both APKs share package com.dschat.android, versionName 0.1.3,')
+[void]$sb.AppendLine('    minSdk 26, targetSdk 36, 4 declared permissions')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine(("Generated: {0}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')))
 

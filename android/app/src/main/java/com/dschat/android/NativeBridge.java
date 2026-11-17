@@ -50,6 +50,24 @@ final class NativeBridge {
 
     /** 稍长的原生 Toast（导入历史对话等耗时操作的提示）。 */
     @JavascriptInterface
+    public void openPdf(String base64, String fileName) {
+        activity.openPdf(String.valueOf(base64), String.valueOf(fileName));
+    }
+
+    @JavascriptInterface
+    public void openFile(String base64, String mimeType, String fileName) {
+        activity.openFile(String.valueOf(base64), String.valueOf(mimeType), String.valueOf(fileName));
+    }
+    @JavascriptInterface
+    public void shareFile(String base64, String mimeType, String fileName) {
+        activity.shareFile(String.valueOf(base64), String.valueOf(mimeType), String.valueOf(fileName));
+    }
+
+    @JavascriptInterface
+    public void saveImage(String url, String fileName) {
+        activity.saveImage(String.valueOf(url), String.valueOf(fileName));
+    }
+    @JavascriptInterface
     public void toastLong(String message) {
         activity.showToastLong(String.valueOf(message));
     }

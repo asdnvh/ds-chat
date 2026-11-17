@@ -69,6 +69,33 @@ final class DownloadStore {
     }
 
     /** Android 8/9 兜底：写入应用专属外部目录（卸载应用时会被清理），无需存储权限。 */
+    /** 保存到系统下载目录并返回 content Uri（供系统分享弹窗使用） */
+    static android.net.Uri saveForShare(Context context, byte[] data, String mimeType, String requestedName) {
+        String fileName = sanitizeName(requestedName, mimeType);
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
+        values.put(MediaStore.Downloads.MIME_TYPE, mimeType);
+        values.put(MediaStore.Downloads.IS_PENDING, 1);
+        android.content.ContentResolver resolver = context.getContentResolver();
+        android.net.Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+        if (uri == null) {
+            return null;
+        }
+        try (java.io.OutputStream out = resolver.openOutputStream(uri)) {
+            if (out == null) {
+                return null;
+            }
+            out.write(data);
+            out.flush();
+        } catch (java.io.IOException error) {
+            return null;
+        } finally {
+            values.clear();
+            values.put(MediaStore.Downloads.IS_PENDING, 0);
+            resolver.update(uri, values, null, null);
+        }
+        return uri;
+    }
     private static String saveToAppExternalDir(Context context, byte[] data, String fileName)
             throws IOException {
         File base = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);

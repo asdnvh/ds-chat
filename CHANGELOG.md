@@ -1,3 +1,9 @@
+## v0.1.3
+- 新增：AI 生成文件（docx/xlsx/pptx/pdf/md/txt/csv/json/html）并通过 tool call 发送；
+- 新增：文档预览（docx/xlsx/pptx 大纲）、PDF 内置阅读器、文件系统分享与保存菜单；
+- 新增：图片搜索结果显示与长按保存；压缩包 zip/rar/7z 本地解压；大 PDF 自动拆分上传；
+- 修复：语音输入、上传错误提示、docx 解析失败兜底等。
+
 # Changelog
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 风格，版本号跟随上游
